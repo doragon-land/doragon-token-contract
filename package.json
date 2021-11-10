@@ -15,7 +15,7 @@
     "verify-token-mainnet": "npx hardhat run --network mainnet ./scripts/verify-token.js"
   },
   "keywords": [],
-  "author": "Martin Ngo",
+  "author": "Martin NGO",
   "license": "ISC",
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.1",

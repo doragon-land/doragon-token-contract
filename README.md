@@ -8,9 +8,11 @@ yarn
 ```
 
 ## Deploying
-1. Rename `secrets_example.json` to `secrets.json`
-2. Edit the value of 2 fields `mnemonic` and `bscScanKey`
-3. 
+1. Make .env file
+2. Add your values: TOKEN_DEPLOYER_ADDRESS, TOKEN_TOTAL_SUPPLY
+
 ```bash
-yarn deploy-testnet
+yarn install
+yarn compile
+yarn deploy-token-mainnet
 ```
