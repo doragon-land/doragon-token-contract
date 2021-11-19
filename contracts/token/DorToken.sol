@@ -6,12 +6,48 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import './../token/BEP20.sol';
 import '@openzeppelin/contracts/utils/Context.sol';
 
+abstract contract BPContract {
+    function protect(
+        address sender,
+        address receiver,
+        uint256 amount
+    ) external virtual;
+}
+
 contract DorToken is Ownable, BEP20 {
+
+    BPContract public BP;
+    bool public bpEnabled;
+    bool public BPDisabledForever = false;
+
     constructor(address wallet, uint256 totalSupply) Ownable() BEP20("Dor Token","DOR") {
         _mint(wallet, totalSupply);
         transferOwnership(wallet);
     }
 
+    /**
+     * @dev Set Bot Protection addreess
+     */
+    function setBPAddrss(address _bp) external onlyOwner {
+        require(address(BP) == address(0), "Can only be initialized once");
+        BP = BPContract(_bp);
+    }
+
+    /**
+     * @dev Enable/Disable Bot Protection
+     */
+    function setBpEnabled(bool _enabled) external onlyOwner {
+        bpEnabled = _enabled;
+    }
+
+    /**
+     * @dev Disable Bot Protection forever
+     */
+    function setBotProtectionDisableForever() external onlyOwner {
+        require(BPDisabledForever == false);
+        BPDisabledForever = true;
+    }
+    
     /**
      * @dev Creates `amount` tokens and assigns them to `msg.sender`, increasing
      * the total supply.
@@ -56,5 +92,26 @@ contract DorToken is Ownable, BEP20 {
             _approve(account, _msgSender(), currentAllowance - amount);
         }
         _burn(account, amount);
+    }
+
+    /**
+     * @dev Moves tokens `amount` from `sender` to `recipient`.
+     *
+     * This is internal function is equivalent to {transfer}, and can be used to
+     * e.g. implement automatic token fees, slashing mechanisms, etc.
+     *
+     * Emits a {Transfer} event.
+     *
+     * Requirements:
+     *
+     * - `sender` cannot be the zero address.
+     * - `recipient` cannot be the zero address.
+     * - `sender` must have a balance of at least `amount`.
+     */
+    function _transfer(address from, address to, uint256 amount) internal override {
+        if (bpEnabled && !BPDisabledForever){
+                BP.protect(from, to, amount);
+        }
+        super._transfer(from, to, amount);
     }
 }
